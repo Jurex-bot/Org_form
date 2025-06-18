@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Organization Application</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: block;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #4a6fa5;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a6fa5;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a6fa5;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #4a6fa5;
+            outline: none;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .checkbox-group {
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-item input {
+            margin-right: 10px;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .download-btn {
+            background-color: #4a6fa5;
+            color: white;
+        }
+        
+        .download-btn:hover {
+            background-color: #3a5a80;
+        }
+        
+        .send-btn {
+            background-color: #4267B2;
+            color: white;
+        }
+        
+        .send-btn:hover {
+            background-color: #365899;
+        }
+        
+        #other-lang-container {
+            display: none;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+        
+        /* For screenshot */
+        #screenshot-container {
+            display: inline-block;
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="screenshot-container">
+            <img src="https://i.imgur.com/hQZVIql.png" alt="Organization Logo" class="logo" id="logo">
+            
+            <div class="card" id="form-card">
+                <h1>Organization Application Form</h1>
+                
+                <form id="application-form">
+                    <div class="form-group">
+                        <label for="code-name">Your Code Name</label>
+                        <input type="text" id="code-name" name="code-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="skills">What are your skills in coding?</label>
+                        <textarea id="skills" name="skills" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="purpose">What is your purpose or why would you like to be a member of our organization?</label>
+                        <textarea id="purpose" name="purpose" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>What programming languages have you studied?</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="lang-js" name="languages" value="JavaScript">
+                                <label for="lang-js">JavaScript</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="lang-py" name="languages" value="Python">
+                                <label for="lang-py">Python</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="lang-java" name="languages" value="Java">
+                                <label for="lang-java">Java</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="lang-cpp" name="languages" value="C++">
+                                <label for="lang-cpp">C++</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="lang-cs" name="languages" value="C#">
+                                <label for="lang-cs">C#</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="lang-php" name="languages" value="PHP">
+                                <label for="lang-php">PHP</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="lang-other" name="languages" value="Other">
+                                <label for="lang-other">Other</label>
+                            </div>
+                            <div id="other-lang-container">
+                                <input type="text" id="other-lang" name="other-lang" placeholder="Please specify other languages">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="birthdate">Birthdate</label>
+                        <input type="date" id="birthdate" name="birthdate" required>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button type="button" class="download-btn" id="download-btn">Download Form</button>
+                        <button type="button" class="send-btn" id="send-btn">Send Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for download reminder -->
+    <div id="downloadModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Before Sending</h2>
+            <p>Please make sure you've downloaded your application form first. You'll need to attach it when sending to our Facebook page.</p>
+            <button id="proceedToFB" class="send-btn" style="margin-top: 20px;">I've downloaded it - Proceed to Facebook</button>
+        </div>
+    </div>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+        // Show other language field only when "Other" is checked
+        document.getElementById('lang-other').addEventListener('change', function() {
+            const otherLangContainer = document.getElementById('other-lang-container');
+            const otherLangField = document.getElementById('other-lang');
+            
+            if (this.checked) {
+                otherLangContainer.style.display = 'block';
+                otherLangField.setAttribute('required', '');
+            } else {
+                otherLangContainer.style.display = 'none';
+                otherLangField.removeAttribute('required');
+                otherLangField.value = '';
+            }
+        });
+        
+        // Get form data as text
+        function getFormDataAsText() {
+            const form = document.getElementById('application-form');
+            const formData = new FormData(form);
+            let text = "Organization Application Form\n\n";
+            
+            text += `Code Name: ${formData.get('code-name')}\n\n`;
+            text += `Skills:\n${formData.get('skills')}\n\n`;
+            text += `Purpose:\n${formData.get('purpose')}\n\n`;
+            
+            // Get selected languages
+            const languages = [];
+            document.querySelectorAll('input[name="languages"]:checked').forEach(checkbox => {
+                if (checkbox.value === 'Other') {
+                    const otherLang = document.getElementById('other-lang').value;
+                    if (otherLang) languages.push(otherLang);
+                } else {
+                    languages.push(checkbox.value);
+                }
+            });
+            text += `Programming Languages: ${languages.join(', ')}\n\n`;
+            text += `Birthdate: ${formData.get('birthdate')}\n\n`;
+            
+            return text;
+        }
+        
+        // Download button functionality - captures both logo and form
+        document.getElementById('download-btn').addEventListener('click', function() {
+            const screenshotContainer = document.getElementById('screenshot-container');
+            
+            // Temporarily show the "Other" field if it has content
+            const otherLangField = document.getElementById('other-lang');
+            if (otherLangField.value.trim() !== '') {
+                document.getElementById('other-lang-container').style.display = 'block';
+            }
+            
+            html2canvas(screenshotContainer, {
+                scale: 2, // Higher quality
+                logging: false,
+                useCORS: true, // For external images (logo)
+                allowTaint: true,
+                backgroundColor: '#f5f7fa'
+            }).then(canvas => {
+                // Reset the display if it was changed
+                if (!document.getElementById('lang-other').checked) {
+                    document.getElementById('other-lang-container').style.display = 'none';
+                }
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'application-form-' + new Date().getTime() + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // Store that user has downloaded
+                localStorage.setItem('hasDownloaded', 'true');
+            });
+        });
+        
+        // Modal elements
+        const modal = document.getElementById('downloadModal');
+        const span = document.getElementsByClassName('close')[0];
+        const proceedBtn = document.getElementById('proceedToFB');
+        
+        // When user clicks send button
+        document.getElementById('send-btn').addEventListener('click', function() {
+            // Validate form first
+            const form = document.getElementById('application-form');
+            const allInputsValid = Array.from(form.elements).every(element => {
+                if (element.required && !element.value.trim()) {
+                    element.focus();
+                    return false;
+                }
+                return true;
+            });
+            
+            if (!allInputsValid) {
+                alert('Please fill in all required fields before submitting.');
+                return;
+            }
+            
+            // Check if user has downloaded
+            if (localStorage.getItem('hasDownloaded') {
+                sendToFacebook();
+            } else {
+                modal.style.display = 'block';
+            }
+        });
+        
+        // When user clicks to proceed to Facebook
+        proceedBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+            sendToFacebook();
+        });
+        
+        // When user closes the modal
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+        
+        // When user clicks outside the modal
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Function to redirect to Facebook with pre-filled message
+        function sendToFacebook() {
+            const formText = getFormDataAsText();
+            const encodedText = encodeURIComponent(formText);
+            
+            // Replace with your actual Facebook page URL
+            const fbUrl = `https://www.facebook.com/jurex.aso`;
+            
+            // Open in new tab
+            window.open(fbUrl, '_blank');
+            
+            // Clear the download flag
+            localStorage.removeItem('hasDownloaded');
+        }
+    </script>
+</body>
+</html>
