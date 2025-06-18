@@ -153,44 +153,9 @@
             padding: 20px;
         }
         
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-        }
-        
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 500px;
-            text-align: center;
-        }
-        
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .close:hover {
-            color: black;
-        }
-        
-        .modal-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
+        .required-field::after {
+            content: " *";
+            color: red;
         }
     </style>
 </head>
@@ -204,22 +169,22 @@
                 
                 <form id="application-form">
                     <div class="form-group">
-                        <label for="code-name">Your Code Name</label>
+                        <label for="code-name" class="required-field">Your Code Name</label>
                         <input type="text" id="code-name" name="code-name" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="skills">What are your skills in coding?</label>
+                        <label for="skills" class="required-field">What are your skills in coding?</label>
                         <textarea id="skills" name="skills" required></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label for="purpose">What is your purpose or why would you like to be a member of our organization?</label>
+                        <label for="purpose" class="required-field">What is your purpose or why would you like to be a member of our organization?</label>
                         <textarea id="purpose" name="purpose" required></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label>What programming languages have you studied?</label>
+                        <label class="required-field">What programming languages have you studied?</label>
                         <div class="checkbox-group">
                             <div class="checkbox-item">
                                 <input type="checkbox" id="lang-js" name="languages" value="JavaScript">
@@ -256,7 +221,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="birthdate">Birthdate</label>
+                        <label for="birthdate" class="required-field">Birthdate</label>
                         <input type="date" id="birthdate" name="birthdate" required>
                     </div>
                     
@@ -265,19 +230,6 @@
                         <button type="button" class="send-btn" id="send-btn">Send Application</button>
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Download reminder modal -->
-    <div id="downloadModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Before Sending</h2>
-            <p>Please download your application form first, then attach it when messaging the developer on Facebook.</p>
-            <div class="modal-buttons">
-                <button id="downloadFromModal" class="download-btn">Download Now</button>
-                <button id="proceedToFB" class="send-btn">Already Downloaded</button>
             </div>
         </div>
     </div>
@@ -291,23 +243,68 @@
             
             if (this.checked) {
                 otherLangContainer.style.display = 'block';
-                otherLangField.setAttribute('required', '');
             } else {
                 otherLangContainer.style.display = 'none';
-                otherLangField.removeAttribute('required');
                 otherLangField.value = '';
             }
         });
-        
-        // Download form as image
-        function downloadForm() {
+
+        // Validate form before any action
+        function validateForm() {
+            let isValid = true;
+            const requiredFields = document.querySelectorAll('[required]');
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = 'red';
+                    isValid = false;
+                    if (field.type !== 'checkbox') {
+                        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } else {
+                    field.style.borderColor = '#ddd';
+                }
+            });
+            
+            // Validate at least one language is checked
+            const languageCheckboxes = document.querySelectorAll('input[name="languages"]:checked');
+            if (languageCheckboxes.length === 0) {
+                document.querySelector('.checkbox-group').style.border = '1px solid red';
+                document.querySelector('.checkbox-group').style.padding = '10px';
+                document.querySelector('.checkbox-group').style.borderRadius = '5px';
+                isValid = false;
+            } else {
+                document.querySelector('.checkbox-group').style.border = 'none';
+                document.querySelector('.checkbox-group').style.padding = '0';
+            }
+            
+            // Validate other language field if checked
+            if (document.getElementById('lang-other').checked && 
+                !document.getElementById('other-lang').value.trim()) {
+                document.getElementById('other-lang').style.borderColor = 'red';
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        // Download button functionality
+        document.getElementById('download-btn').addEventListener('click', function() {
+            if (!validateForm()) {
+                alert('Please fill in all required fields correctly before downloading.');
+                return;
+            }
+            
             const screenshotContainer = document.getElementById('screenshot-container');
             
-            // Temporarily show the "Other" field if it has content
-            const otherLangField = document.getElementById('other-lang');
-            if (otherLangField.value.trim() !== '') {
+            // Temporarily show the "Other" field if it's checked
+            if (document.getElementById('lang-other').checked) {
                 document.getElementById('other-lang-container').style.display = 'block';
             }
+            
+            // Hide buttons for cleaner screenshot
+            const buttons = document.querySelector('.buttons');
+            buttons.style.display = 'none';
             
             html2canvas(screenshotContainer, {
                 scale: 2,
@@ -316,89 +313,60 @@
                 allowTaint: true,
                 backgroundColor: '#f5f7fa'
             }).then(canvas => {
-                // Reset the display if it was changed
-                if (!document.getElementById('lang-other').checked) {
-                    document.getElementById('other-lang-container').style.display = 'none';
-                }
+                // Restore buttons
+                buttons.style.display = 'flex';
                 
                 // Create download link
                 const link = document.createElement('a');
-                link.download = 'application-form-' + new Date().getTime() + '.png';
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                link.download = `application-form-${timestamp}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                
-                // Mark as downloaded
-                localStorage.setItem('hasDownloaded', 'true');
             });
-        }
-        
-        // Modal elements
-        const modal = document.getElementById('downloadModal');
-        const span = document.getElementsByClassName('close')[0];
-        const proceedBtn = document.getElementById('proceedToFB');
-        const downloadModalBtn = document.getElementById('downloadFromModal');
-        
-        // Download button click
-        document.getElementById('download-btn').addEventListener('click', downloadForm);
-        
-        // Download from modal button
-        downloadModalBtn.addEventListener('click', function() {
-            downloadForm();
-            modal.style.display = 'none';
         });
         
-        // When user clicks send button
+        // Send button functionality - opens Facebook with pre-filled message
         document.getElementById('send-btn').addEventListener('click', function() {
-            // Validate form first
-            const form = document.getElementById('application-form');
-            const allInputsValid = Array.from(form.elements).every(element => {
-                if (element.required && !element.value.trim()) {
-                    element.focus();
-                    return false;
-                }
-                return true;
-            });
-            
-            if (!allInputsValid) {
-                alert('Please fill in all required fields before submitting.');
+            if (!validateForm()) {
+                alert('Please fill in all required fields correctly before sending.');
                 return;
             }
             
-            // Check if user has downloaded
-            if (localStorage.getItem('hasDownloaded')) {
-                redirectToDeveloperProfile();
-            } else {
-                modal.style.display = 'block';
-            }
-        });
-        
-        // When user clicks to proceed to Facebook
-        proceedBtn.addEventListener('click', function() {
-            modal.style.display = 'none';
-            redirectToDeveloperProfile();
-        });
-        
-        // Close modal
-        span.onclick = function() {
-            modal.style.display = 'none';
-        }
-        
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
-        
-        // Redirect to developer's Facebook profile
-        function redirectToDeveloperProfile() {
-            // Replace with actual developer's Facebook profile URL
-            const developerProfile = 'https://www.facebook.com/profile.php?id=61567459439445';
-            window.open(developerProfile, '_blank');
+            // Get all form data
+            const formData = {
+                codeName: document.getElementById('code-name').value,
+                skills: document.getElementById('skills').value,
+                purpose: document.getElementById('purpose').value,
+                languages: Array.from(document.querySelectorAll('input[name="languages"]:checked'))
+                                .map(el => el.value === 'Other' ? 
+                                    document.getElementById('other-lang').value : 
+                                    el.value),
+                birthdate: document.getElementById('birthdate').value
+            };
             
-            // Clear the download flag
-            localStorage.removeItem('hasDownloaded');
-        }
+            // Create message text
+            let message = `Application Form Submission\n\n`;
+            message += `Code Name: ${formData.codeName}\n`;
+            message += `Birthdate: ${formData.birthdate}\n\n`;
+            message += `Skills:\n${formData.skills}\n\n`;
+            message += `Purpose:\n${formData.purpose}\n\n`;
+            message += `Programming Languages:\n- ${formData.languages.join('\n- ')}\n\n`;
+            message += `Please find my completed application form attached.`;
+            
+            // Encode message for URL
+            const encodedMessage = encodeURIComponent(message);
+            
+            // Open Facebook with pre-filled message
+            // Replace with your actual Facebook profile ID or page URL
+            const facebookUrl = `https://www.facebook.com/messages/t/profile.php?id=61567459439445`;
+            window.open(facebookUrl, '_blank');
+            
+            // Note: Facebook doesn't support pre-filled messages in URLs anymore due to spam prevention
+            // Alternative would be to copy the message to clipboard
+            navigator.clipboard.writeText(message).then(() => {
+                alert('Your application details have been copied to clipboard. Please paste them in your Facebook message along with the downloaded form image.');
+            });
+        });
     </script>
 </body>
 </html>
