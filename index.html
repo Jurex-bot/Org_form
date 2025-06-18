@@ -171,6 +171,7 @@
             border-radius: 10px;
             width: 80%;
             max-width: 500px;
+            text-align: center;
         }
         
         .close {
@@ -183,6 +184,13 @@
         
         .close:hover {
             color: black;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -261,13 +269,16 @@
         </div>
     </div>
 
-    <!-- Modal for download reminder -->
+    <!-- Download reminder modal -->
     <div id="downloadModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Before Sending</h2>
-            <p>Please make sure you've downloaded your application form first. You'll need to attach it when sending to our Facebook page.</p>
-            <button id="proceedToFB" class="send-btn" style="margin-top: 20px;">I've downloaded it - Proceed to Facebook</button>
+            <p>Please download your application form first, then attach it when messaging the developer on Facebook.</p>
+            <div class="modal-buttons">
+                <button id="downloadFromModal" class="download-btn">Download Now</button>
+                <button id="proceedToFB" class="send-btn">Already Downloaded</button>
+            </div>
         </div>
     </div>
 
@@ -288,34 +299,8 @@
             }
         });
         
-        // Get form data as text
-        function getFormDataAsText() {
-            const form = document.getElementById('application-form');
-            const formData = new FormData(form);
-            let text = "Organization Application Form\n\n";
-            
-            text += `Code Name: ${formData.get('code-name')}\n\n`;
-            text += `Skills:\n${formData.get('skills')}\n\n`;
-            text += `Purpose:\n${formData.get('purpose')}\n\n`;
-            
-            // Get selected languages
-            const languages = [];
-            document.querySelectorAll('input[name="languages"]:checked').forEach(checkbox => {
-                if (checkbox.value === 'Other') {
-                    const otherLang = document.getElementById('other-lang').value;
-                    if (otherLang) languages.push(otherLang);
-                } else {
-                    languages.push(checkbox.value);
-                }
-            });
-            text += `Programming Languages: ${languages.join(', ')}\n\n`;
-            text += `Birthdate: ${formData.get('birthdate')}\n\n`;
-            
-            return text;
-        }
-        
-        // Download button functionality - captures both logo and form
-        document.getElementById('download-btn').addEventListener('click', function() {
+        // Download form as image
+        function downloadForm() {
             const screenshotContainer = document.getElementById('screenshot-container');
             
             // Temporarily show the "Other" field if it has content
@@ -325,9 +310,9 @@
             }
             
             html2canvas(screenshotContainer, {
-                scale: 2, // Higher quality
+                scale: 2,
                 logging: false,
-                useCORS: true, // For external images (logo)
+                useCORS: true,
                 allowTaint: true,
                 backgroundColor: '#f5f7fa'
             }).then(canvas => {
@@ -342,15 +327,25 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 
-                // Store that user has downloaded
+                // Mark as downloaded
                 localStorage.setItem('hasDownloaded', 'true');
             });
-        });
+        }
         
         // Modal elements
         const modal = document.getElementById('downloadModal');
         const span = document.getElementsByClassName('close')[0];
         const proceedBtn = document.getElementById('proceedToFB');
+        const downloadModalBtn = document.getElementById('downloadFromModal');
+        
+        // Download button click
+        document.getElementById('download-btn').addEventListener('click', downloadForm);
+        
+        // Download from modal button
+        downloadModalBtn.addEventListener('click', function() {
+            downloadForm();
+            modal.style.display = 'none';
+        });
         
         // When user clicks send button
         document.getElementById('send-btn').addEventListener('click', function() {
@@ -370,8 +365,8 @@
             }
             
             // Check if user has downloaded
-            if (localStorage.getItem('hasDownloaded') {
-                sendToFacebook();
+            if (localStorage.getItem('hasDownloaded')) {
+                redirectToDeveloperProfile();
             } else {
                 modal.style.display = 'block';
             }
@@ -380,31 +375,26 @@
         // When user clicks to proceed to Facebook
         proceedBtn.addEventListener('click', function() {
             modal.style.display = 'none';
-            sendToFacebook();
+            redirectToDeveloperProfile();
         });
         
-        // When user closes the modal
+        // Close modal
         span.onclick = function() {
             modal.style.display = 'none';
         }
         
-        // When user clicks outside the modal
+        // Close modal when clicking outside
         window.onclick = function(event) {
             if (event.target == modal) {
                 modal.style.display = 'none';
             }
         }
         
-        // Function to redirect to Facebook with pre-filled message
-        function sendToFacebook() {
-            const formText = getFormDataAsText();
-            const encodedText = encodeURIComponent(formText);
-            
-            // Replace with your actual Facebook page URL
-            const fbUrl = `https://www.facebook.com/jurex.aso`;
-            
-            // Open in new tab
-            window.open(fbUrl, '_blank');
+        // Redirect to developer's Facebook profile
+        function redirectToDeveloperProfile() {
+            // Replace with actual developer's Facebook profile URL
+            const developerProfile = 'https://www.facebook.com/profile.php?id=61567459439445';
+            window.open(developerProfile, '_blank');
             
             // Clear the download flag
             localStorage.removeItem('hasDownloaded');
